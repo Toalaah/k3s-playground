@@ -28,7 +28,7 @@ interact with the cluster without needing to remote into the server.
    otherwise you will not be able to remote into the saver on your next
    session.
 
-   ```
+    ```
     Status: active
 
     To                         Action      From
@@ -39,7 +39,7 @@ interact with the cluster without needing to remote into the server.
     6443/tcp (v6)              ALLOW       Anywhere (v6)
     22/tcp (v6)                ALLOW       Anywhere (v6)
     Nginx Full (v6)            ALLOW       Anywhere (v6)
-  ```
+    ```
 
 2. (Optional) create DNS entry pointing to IP of server
 
