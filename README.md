@@ -16,8 +16,9 @@ of the things I did in a couple weeks time).
 
 1. [Initialize Cluster](#initialize-cluster)
 1. [Create a Demo Deployment](#demo-deployment)
-1. [Setup NGINX Ingress Controller](#setup-nginx-ingress-controller)
-1. [Setup Kubernetes Dashboard](#setup-kubernetes-dashboard)
+1. [NGINX Ingress Controller](#nginx-ingress-controller)
+1. [Kubernetes Dashboard](#kubernetes-dashboard)
+1. [Persistent Storage](#persistent-storage)
 
 ## Initialize Cluster
 
@@ -76,7 +77,7 @@ to interact with the cluster without needing to remote into the server.
 
    ```bash
    # if DNS record was setup (replace host appropriately)
-   export HOST="k8s.kunst.me"
+   export HOST="k8s.example.com"
    k3sup install --host $HOST\
     --ssh-key $HOME/.ssh/path/to/key\
     --k3s-extra-args '--no-deploy traefik --write-kubeconfig-mode 644 --node-name k3s-master-01'\
@@ -112,7 +113,7 @@ to interact with the cluster without needing to remote into the server.
 
 </details>
 
-## Setup NGINX Ingress Controller
+## NGINX Ingress Controller
 
 [*📖 Back to Table of Contents*](#table-of-contents)
 
@@ -160,7 +161,18 @@ to interact with the cluster without needing to remote into the server.
 
 </details>
 
-## Setup Kubernetes Dashboard
+## Kubernetes Dashboard
+
+[*📖 Back to Table of Contents*](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+  > 🤔 TODO
+
+</details>
+
+## Persistent Storage
 
 [*📖 Back to Table of Contents*](#table-of-contents)
 
