@@ -109,7 +109,69 @@ to interact with the cluster without needing to remote into the server.
 <details open>
 <summary>Collapse Section</summary><br>
 
-  > 🤔 TODO
+In this section we will be deploying the demo Next.js application found
+[here](./demo-app/README.md). We will create a deployment with 2 replicas along
+with a service in order to allow us to assign network policies / ingresses to
+the pods. This will all be created in a namespace `demo`, allowing us to clean
+up more easily afterwards
+
+The manifest [`demo-app.yml`](./demo-app.yml) is comprised of the following parts:
+
+1. A namespace specification. This will create the namespace `demo` if it does
+   not yet exist
+
+1. The deployment specification. This will create a deployment with 2 container
+   replicas running the demo [Next.js](./demo-app/README.md) application.
+
+   > **Note:** feel free to swap this image out with any other image you
+   > preference. It will, by default, search the docker registry so make sure
+   > that it can be found there. You might also need to change the container
+   > port in the deploymeny specification.
+
+1. The service specification. This will allow us to interface with the pods.
+
+   > **Note:** the target port must match the container port specified in the
+   > deployment block. If you changed the image, you might need to amend this
+   > in the service as well.
+
+1. The ingress specification.
+
+Deploying this is as easy as running the following command
+
+```bash
+kubectl apply -f demo-app.yml
+```
+
+You should see the following output
+
+```
+namespace/demo created
+deployment.apps/k3s-demo created
+service/svc-k3s-demo created
+ingress.networking.k8s.io/ingress-k3s-demo created
+```
+
+You can verify the status of the pods, services, and ingresses by running
+`kubectl get all,ingress -n demo`. The output should be similar to the
+following (uptimes and IPs may of course be different).
+
+```
+NAME                            READY   STATUS    RESTARTS   AGE
+pod/k3s-demo-69d5ffc6c8-g8986   1/1     Running   0          11m
+pod/k3s-demo-69d5ffc6c8-bpjqd   1/1     Running   0          11m
+
+NAME                   TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+service/svc-k3s-demo   ClusterIP   10.43.74.130   <none>        80/TCP    11m
+
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/k3s-demo   2/2     2            2           11m
+
+NAME                                  DESIRED   CURRENT   READY   AGE
+replicaset.apps/k3s-demo-69d5ffc6c8   2         2         2       11m
+
+NAME                                         CLASS    HOSTS   ADDRESS         PORTS   AGE
+ingress.networking.k8s.io/ingress-k3s-demo   <none>   *       192.168.0.1     80      11m
+```
 
 </details>
 
@@ -131,7 +193,7 @@ to interact with the cluster without needing to remote into the server.
   ```
 
   Running `kubectl get all -n ingress-nginx` should produce an ouput similar to
-  the following (Uptimes and IPs may of course be different).
+  the following (uptimes and IPs may of course be different).
 
   ```
   NAME                                            READY   STATUS      RESTARTS   AGE
