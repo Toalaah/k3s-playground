@@ -91,7 +91,7 @@ to interact with the cluster without needing to remote into the server.
     --local-path $HOME/.kube/config
    ```
 
-  > **Note:** You can copy ssh keys to a remote VM with `ssh-copy-id user@IP`.
+    > **Note:** You can copy ssh keys to a remote VM with `ssh-copy-id user@IP`.
 
 1. Ensure that the installation succeeded by running `kubectl get nodes`. You
    should something similar to the following output.
