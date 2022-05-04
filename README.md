@@ -1,21 +1,38 @@
-# Simple Single-Node Kubernetes Setup (K3S)
+# Simple Single-Node Kubernetes Setup (K3s)
 
-Outlines the process of setting up a simple single-node cluster using k3s. This
-repo primarily serves the purpose of documentation, storing various notes,
-links, and code-snippets which I ~~found~~ find helpful while learning about
-Kubernetes.
+Outlines the process of setting up a simple single-node cluster using
+[K3s](https://k3s.io). This repo primarily serves the purpose of documentation;
+storing various notes, links, and code-snippets which I ~~found~~ find helpful
+while learning about Kubernetes. I plan to grow this readme over time by adding
+the steps I took while setting up a cluster (mainly so that I don't forget half
+of the things I did in a couple weeks time).
 
-## Steps for Basic Setup
+> **Note:** This is all tested on a standard DigitalOcean droplet. No
+> guarantees for other providers, but the process should translate mostly
+> one-for-one.
 
-This setup will create and link a single-node k3s cluster to a remove VM. It
-will also save the `kubeconfig` file to your local machine allowing you to
-interact with the cluster without needing to remote into the server.
 
-> **Note:** this was tested on a standard digital ocean droplet
+## Table of Contents
+
+1. [Initialize Cluster](#initialize-cluster)
+1. [Create a Demo Deployment](#demo-deployment)
+1. [Setup Nginx Ingress Controller](#setup-nginx-ingress-controller)
+1. [Setup Kubernetes Dashboard](#setup-kubernetes-dashboard)
+
+## Initialize Cluster
+
+[*📖 Back to Table of Contents*](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+In this section we will create and link a single-node K3s cluster to a remove
+VM. It will also save the `kubeconfig` file to your local machine allowing you
+to interact with the cluster without needing to remote into the server.
 
 1. Setup a VPS / server. Make sure that the ports 80, 443, and 6443 are open.
-   On Ubuntu you can open a port with `sudo ufw allow 80/tcp` (or `udp`). The easiest
-   way to do this is to install nginx and run the following as root.
+   On Ubuntu you can open a port with `sudo ufw allow {PORT}/tcp` (or `udp`). The easiest
+   way to do this is to install Nginx and run the following as root.
 
    ```bash
     ufw allow 'Nginx Full'
@@ -24,7 +41,7 @@ interact with the cluster without needing to remote into the server.
    ```
 
    Running `ufw status` as root should produce an output similar to the
-   following (note that when enabling ufw you will also have to open port 22,
+   following (note that when enabling `ufw` you will also have to open port 22,
    otherwise you will not be able to remote into the saver on your next
    session.
 
@@ -41,20 +58,20 @@ interact with the cluster without needing to remote into the server.
     Nginx Full (v6)            ALLOW       Anywhere (v6)
     ```
 
-2. (Optional) create DNS entry pointing to IP of server
+1. (Optional) create DNS entry pointing to IP of server.
 
-3. Download [k3sup](https://github.com/alexellis/k3sup)
+1. Download and install [k3sup](https://github.com/alexellis/k3sup)
 
    ```bash
    curl -sLS https://get.k3sup.dev | sh
    sudo install k3sup /usr/local/bin/
    ```
 
-4. Install k3s to the server using either the `--ip` or `--host` flag,
+1. Install K3s to the server using either the `--ip` or `--host` flag,
    depending on whether or not you created a DNS entry. Note that this will
    overwrite your kubeconfig in `$HOME/.kube/config`.
 
-   > **Note:** We will install k3s without the standard traefik ingress
+   > **Note:** We will install K3s without the standard Traefik ingress
    > as we will be manually adding an Nginx ingress controller later.
 
    ```bash
@@ -73,13 +90,46 @@ interact with the cluster without needing to remote into the server.
     --local-path $HOME/.kube/config
    ```
 
-  > **Note:** You can copy ssh keys to a remote VM with `ssh-copy-id user@IP`
+  > **Note:** You can copy ssh keys to a remote VM with `ssh-copy-id user@IP`.
 
-5. Ensure that the installation succeeded by running `kubectl get nodes`. You
-   should something similar to the following output
+1. Ensure that the installation succeeded by running `kubectl get nodes`. You
+   should something similar to the following output.
 
     ```
     NAME            STATUS   ROLES                  AGE     VERSION
     k3s-master-01   Ready    control-plane,master   3h29m   v1.22.7+k3s1
     ```
+</details>
 
+## Demo Deployment
+
+[*📖 Back to Table of Contents*](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+  > 🤔 TODO
+
+</details>
+
+## Setup Nginx Ingress Controller
+
+[*📖 Back to Table of Contents*](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+  > 🤔 TODO
+
+</details>
+
+## Setup Kubernetes Dashboard
+
+[*📖 Back to Table of Contents*](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+  > 🤔 TODO
+
+</details>
