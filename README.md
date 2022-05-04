@@ -19,10 +19,11 @@ of the things I did in a couple weeks time).
 1. [NGINX Ingress Controller](#nginx-ingress-controller)
 1. [Kubernetes Dashboard](#kubernetes-dashboard)
 1. [Persistent Storage](#persistent-storage)
+1. [TLS Certificates](#tls)
 
 ## Initialize Cluster
 
-[*📖 Back to Table of Contents*](#table-of-contents)
+[📖 *Back to Table of Contents*](#table-of-contents)
 
 <details open>
 <summary>Collapse Section</summary><br>
@@ -104,7 +105,7 @@ to interact with the cluster without needing to remote into the server.
 
 ## Demo Deployment
 
-[*📖 Back to Table of Contents*](#table-of-contents)
+[📖 *Back to Table of Contents*](#table-of-contents)
 
 <details open>
 <summary>Collapse Section</summary><br>
@@ -126,7 +127,7 @@ The manifest [`demo-app.yml`](./demo-app.yml) is comprised of the following part
    > **Note:** feel free to swap this image out with any other image you
    > preference. It will, by default, search the docker registry so make sure
    > that it can be found there. You might also need to change the container
-   > port in the deploymeny specification.
+   > port in the deployment specification.
 
 1. The service specification. This will allow us to interface with the pods.
 
@@ -173,11 +174,15 @@ NAME                                         CLASS    HOSTS   ADDRESS         PO
 ingress.networking.k8s.io/ingress-k3s-demo   <none>   *       192.168.0.1     80      11m
 ```
 
+You may notice that you cannot access the application when visiting the IP of
+the remote machine. This is because we need to add an ingress controller which
+will route external traffic to the demo application service.
+
 </details>
 
 ## NGINX Ingress Controller
 
-[*📖 Back to Table of Contents*](#table-of-contents)
+[📖 *Back to Table of Contents*](#table-of-contents)
 
 <details open>
 <summary>Collapse Section</summary><br>
@@ -225,7 +230,7 @@ ingress.networking.k8s.io/ingress-k3s-demo   <none>   *       192.168.0.1     80
 
 ## Kubernetes Dashboard
 
-[*📖 Back to Table of Contents*](#table-of-contents)
+[📖 *Back to Table of Contents*](#table-of-contents)
 
 <details open>
 <summary>Collapse Section</summary><br>
@@ -236,7 +241,18 @@ ingress.networking.k8s.io/ingress-k3s-demo   <none>   *       192.168.0.1     80
 
 ## Persistent Storage
 
-[*📖 Back to Table of Contents*](#table-of-contents)
+[📖 *Back to Table of Contents*](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+  > 🤔 TODO
+
+</details>
+
+## TLS
+
+[📖 *Back to Table of Contents*](#table-of-contents)
 
 <details open>
 <summary>Collapse Section</summary><br>
