@@ -15,8 +15,9 @@ WORKDIR /app
 
 COPY ./docker/run.sh /usr/local/bin/run.sh
 COPY ./package.json ./yarn.lock ./
-RUN yarn --production=true --frozen-lockfile install && yarn cache clean
 COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/prisma ./prisma
+RUN yarn --production=true --frozen-lockfile install && yarn cache clean
 
 ENTRYPOINT []
 CMD ["/usr/local/bin/run.sh"]
