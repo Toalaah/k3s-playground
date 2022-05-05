@@ -17,9 +17,11 @@ of the things I did in a couple weeks time).
 1. [Initialize Cluster](#initialize-cluster)
 1. [Create a Demo Deployment](#demo-deployment)
 1. [NGINX Ingress Controller](#nginx-ingress-controller)
+1. [TLS Certificates](#tls)
+    1. [Staging](#tls-certificate---staging)
+    1. [Production](#tls-certificate---production)
 1. [Kubernetes Dashboard](#kubernetes-dashboard)
 1. [Persistent Storage](#persistent-storage)
-1. [TLS Certificates](#tls)
 
 ## Initialize Cluster
 
@@ -135,7 +137,7 @@ The manifest [`demo-app.yml`](./demo-app.yml) is comprised of the following part
    > deployment block. If you changed the image, you might need to amend this
    > in the service as well.
 
-1. The ingress specification.
+1. The ingress specification. This manages exernal access to the service.
 
 Deploying this is as easy as running the following command
 
@@ -228,6 +230,86 @@ will route external traffic to the demo application service.
 
 </details>
 
+You should now be able to access your deployment by visiting either the IP /
+URL of the server. You should notice that when visiting the site using HTTPS /
+forcing port `443` the app **does** have a TLS certificate; however it is
+self-signed, causing your browser to not trust it by default. In the [next
+section](#tls), we will be adding a certificate manager and cluster issuer
+which will automatically provision our app with a certificate from lets-encrypt
+using [cert-manager](https://cert-manager.io/).
+
+## TLS
+
+[📖 *Back to Table of Contents*](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+In this section we will be adding TLS to our demo deployment. We will use
+[cert-manager](https://cert-manager.io/) to obtain and distribute TLS
+certificates.
+
+### TLS Certificate - Staging
+
+You can setup both the staging cluster issuer and certificate by getting the
+official cert-manager manifest and then applying the manifests in
+`./tls-manager/staging/`
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+kubectl apply -f ./tls-manager/staging/cluster-issuer-staging.yml
+kubectl apply -f ./tls-manager/staging/cert-staging.yml
+```
+
+We then need to register the created certificate secret in our demo
+application. To do this, either apply the TLS-version of the deployment with
+`kubectl apply -f ./tls-manager/staging/demo-app-tls-staging.yml` or manually
+add the secret / annotation to the ingress (changing the host appropriately).
+
+> **Note:** if you only have an IP address you may have to use a service such
+> as [nip.io](https://nip.io/) in order for K3s to consider the host valid.
+
+```yml
+# ...
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-k3s-demo
+  namespace: demo
+  annotations:
+    kubernetes.io/ingress.class: nginx
+     # ⬇️ add this annotation
+    cert-manager.io/cluster-issuer: 'letsencrypt-staging'
+spec:
+  # ⬇️ add this tls spec
+  tls:
+    - hosts:
+      - k8s.kunst.me
+      secretName: tls-staging
+  rules:
+  # ⬇️ add the same host to spec rules
+  - host: k8s.kunst.me
+    http:
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: svc-k3s-demo
+            port:
+              number: 80
+# ...
+```
+
+After a few minutes the certificate should be applied. You can verify the
+success of this step by visitng the deployment and checking the certificate.
+
+**Note:** staging certificates will still show as untrusted on browsers.
+
+### TLS Certificate - Production
+
+</details>
+
 ## Kubernetes Dashboard
 
 [📖 *Back to Table of Contents*](#table-of-contents)
@@ -250,13 +332,3 @@ will route external traffic to the demo application service.
 
 </details>
 
-## TLS
-
-[📖 *Back to Table of Contents*](#table-of-contents)
-
-<details open>
-<summary>Collapse Section</summary><br>
-
-  > 🤔 TODO
-
-</details>

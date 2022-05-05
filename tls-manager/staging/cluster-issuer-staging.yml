@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+  namespace: demo
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: samuel@kunst.me
+    privateKeySecretRef:
+      name: tls-staging
+    solvers:
+    - selector: {}
+      http01:
+        ingress:
+          class: nginx
