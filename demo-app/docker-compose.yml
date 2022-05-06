@@ -1,4 +1,23 @@
 services:
+  app:
+    build:
+      dockerfile: ./docker/Dockerfile
+      context: .
+    environment:
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}?schema=public
+      - NEXT_PUBLIC_API_BASE=http://localhost:3000/api/v1
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    profiles:
+      - local
+
   db:
     image: postgres:13
     volumes:
