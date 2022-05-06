@@ -16,7 +16,9 @@ interface propType {
 
 export const getServerSideProps = async () => {
   try {
-    const count = await prisma.count.findFirst()
+    const count =
+      (await prisma.count.findFirst()) ??
+      await prisma.count.create({ data: { count: 0 } })
     return { props: { dbCount: count, ok: true } }
   } catch (e) {
     return { props: { dbCount: null, ok: false } }
