@@ -228,8 +228,6 @@ will route external traffic to the demo application service.
   job.batch/ingress-nginx-admission-create   1/1           7s         23h
   ```
 
-</details>
-
 You should now be able to access your deployment by visiting either the IP /
 URL of the server. You should notice that when visiting the site using HTTPS /
 forcing port `443` the app **does** have a TLS certificate; however it is
@@ -237,6 +235,8 @@ self-signed, causing your browser to not trust it by default. In the [next
 section](#tls), we will be adding a certificate manager and cluster issuer
 which will automatically provision our app with a certificate from lets-encrypt
 using [cert-manager](https://cert-manager.io/).
+
+</details>
 
 ## TLS
 
@@ -269,7 +269,7 @@ add the secret / annotation to the ingress (changing the host appropriately).
 > **Note:** if you only have an IP address you may have to use a service such
 > as [nip.io](https://nip.io/) in order for K3s to consider the host valid.
 
-```yml
+```yaml
 # ...
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -281,7 +281,7 @@ metadata:
      # ⬇️ add this annotation
     cert-manager.io/cluster-issuer: 'letsencrypt-staging'
 spec:
-  # ⬇️ add this tls spec
+  # ⬇️ add this tls spec (change host accordingly)
   tls:
     - hosts:
       - k8s.kunst.me
@@ -308,6 +308,22 @@ success of this step by visitng the deployment and checking the certificate.
 
 ### TLS Certificate - Production
 
+Assigning a production certificate to your service is just as straight-forward
+as when using a staging-certificate. In fact, all you need to do is change all
+the instances of `letsencrypt-staging` / `tls-staging` to
+`letsencrypt-production` and `tls-production` respectively.
+
+```bash
+# ⬇️ apply this if you haven't already, otherwise skip this
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+kubectl apply -f ./tls-manager/production/cluster-issuer-production.yml
+kubectl apply -f ./tls-manager/production/cert-production.yml
+```
+
+Then either change the ingress in the deployment manifest manually just like in
+the code-snippet above or apply the production-tls-version of the demo app with
+`kubectl apply -f ./tls-manager/production/demo-app-tls-production.yml`
+
 </details>
 
 ## Kubernetes Dashboard
@@ -317,7 +333,59 @@ success of this step by visitng the deployment and checking the certificate.
 <details open>
 <summary>Collapse Section</summary><br>
 
-  > 🤔 TODO
+In this section we will be adding the [kubernetes
+dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/).
+It provides a nice way to oversee your cluster and quickly manage / debug pods.
+We will be deploying the dashboard to the path `/dashboard`, although this is
+configurable to your liking by changing the path / annotations in the
+[`dashboard/dashboard-ingress.yml`](./dashboard/dashboard-ingress.yml) file.
+
+> **Note:** the dashboard is **only** accessible via SSL (HTTPS), so you must
+> ensure you have some sort of infrastructure setup to issue and provision SSL
+> certs to namespaces as described in the [TLS section](#tls) above.
+
+Setting up the dashboard is actually quite straightforward. We will require no
+modifications to the service / pods, so we can deploy the standard AIO
+dashboard as follows
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.0/aio/deploy/recommended.yaml
+```
+
+We will then deploy the RBAC ([role-based access
+control](https://kubernetes.io/docs/reference/access-authn-authz/rbac/))
+config. This will allow us to later login to the dashboard using an admin
+token
+
+```bash
+kubectl -n kubernetes-dashboard apply -f ./dashboard/dashboard-roles.yml
+```
+
+Finally all that is left is to create an SSL-secret in the
+`kubernetes-dashboard` namespace and apply the ingress configuration. **Keep in
+mind** that the sample files in [`./dashboard`](./dashboard) all point to
+`k8s.kunst.me`, so you ~~may want to~~ should change the hosts to suit your
+needs.
+
+> **Note:** the secret / ingress use production certificates from LetsEncrypt.
+> It is advised to test this with staging certs first as to avoid hitting
+> LetsEncrypt's rate-limit should any problems come up.
+
+```bash
+kubectl -n kubernetes-dashboard apply -f ./dashboard/dashboard-tls-production.yml
+kubectl -n kubernetes-dashboard apply -f ./dashboard/dashboard-ingress.yml
+```
+
+You can now get a admin-user token with this "one-liner" (requires either pbcopy or xclip to be installed)
+
+```bash
+TOKEN=$(kubectl -n kubernetes-dashboard describe secret admin-user-token | grep ^token | awk '{print $2}'); echo "$TOKEN" | pbcopy 2>/dev/null || echo "$TOKEN" | xclip -sel in 2>/dev/null; echo "Token copied to clipboard"
+```
+
+If you prefer not to use over-engineered solutions you can, of course, also
+just print the token and then copy it manually with `kubectl -n
+kubernetes-dashboard describe secret admin-user-token | grep ^token | awk
+'{print $2}'`
 
 </details>
 

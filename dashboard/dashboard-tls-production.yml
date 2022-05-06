@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-production
+  namespace: kubernetes-dashboard
+spec:
+  secretName: tls-production
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: k8s.kunst.me
+  dnsNames:
+    - k8s.kunst.me

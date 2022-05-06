@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-kubernetes-dashboard
+  namespace: kubernetes-dashboard
+  annotations:
+    cert-manager.io/cluster-issuer: 'letsencrypt-production'
+    kubernetes.io/ingress.class: nginx
+    # see: https://stackoverflow.com/questions/67985163/
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Accept-Encoding "";
+      sub_filter '<base href="/">' '<base href="/dashboard/">';
+      sub_filter_once on;
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  tls:
+    - hosts:
+      - k8s.kunst.me
+      secretName: tls-production
+  rules:
+    - host: k8s.kunst.me
+      http:
+        paths:
+        # see: https://stackoverflow.com/questions/67985163/
+        - path: /dashboard(/|$)(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 443
+
+---
