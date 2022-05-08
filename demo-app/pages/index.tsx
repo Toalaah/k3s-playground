@@ -1,53 +1,46 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import axios from 'axios'
-import { Count, PrismaClient } from '@prisma/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import type React from 'react'
 
-const prisma = new PrismaClient()
+import { createReactQueryHooks } from '@trpc/react'
+import type { AppRouter } from '../backend/router'
+export const trpc = createReactQueryHooks<AppRouter>()
 
-interface propType {
-  dbCount: Count | null
-  ok: boolean
-}
+const Home: NextPage = () => {
+  var id = 0
+  const ok = useRef(false)
+  const [value, setValue] = useState(0)
+  const mutation = trpc.useMutation(['set-count'])
 
-export const getServerSideProps = async () => {
-  try {
-    const count =
-      (await prisma.count.findFirst()) ??
-      await prisma.count.create({ data: { count: 0 } })
-    return { props: { dbCount: count, ok: true } }
-  } catch (e) {
-    return { props: { dbCount: null, ok: false } }
-  }
-}
-const checkDatabaseConnection = (ok: Boolean) => {
-  if (!ok) {
-    toast.warn(
-      'No database connection could be established, falling back to local state.',
-      {
-        autoClose: 3000,
-        theme: 'dark',
-      },
-    )
-  }
-}
-
-const persistCount = (id: number, count: number) =>
-  axios.post(`${process.env.NEXT_PUBLIC_API_BASE}/count`, {
-    id: id,
-    count: count,
+  const query = trpc.useQuery(['get-count'], {
+    refetchInterval: false,
+    refetchOnReconnect: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    enabled: false,
+    onSuccess: (data) => {
+      ok.current = true
+      setValue(data.count?.count ?? 0)
+    },
+    onError: () => {
+      toast.warn(
+        'No database connection could be established, falling back to local state.',
+        {
+          autoClose: 3000,
+          theme: 'dark',
+        },
+      )
+    },
   })
 
-const Home: NextPage<propType> = (props) => {
-  const { dbCount, ok } = props
-  const [count, setCount] = useState(dbCount?.count ?? 0)
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => checkDatabaseConnection(ok), [])
+  useEffect(() => {
+    query.refetch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className={styles.container}>
@@ -61,12 +54,12 @@ const Home: NextPage<propType> = (props) => {
           <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">K3s</a>!
         </h1>
         <h3 className={styles.code}>
-          This button has been clicked {count} times
+          This button has been clicked {value} times
         </h3>
         <p
           onClick={() => {
-            setCount(count + 1)
-            ok && persistCount(dbCount?.id ?? 0, count + 1)
+            setValue(value + 1)
+            ok.current && mutation.mutate({ id: id, count: value + 1 })
           }}
           className={styles.card}
         >
