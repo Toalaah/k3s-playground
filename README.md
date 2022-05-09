@@ -396,7 +396,31 @@ kubernetes-dashboard describe secret admin-user-token | grep ^token | awk
 <details open>
 <summary>Collapse Section</summary><br>
 
-  > 🤔 TODO
+1. Install [longhorn](https://github.com/longhorn/longhorn) by applying the
+   official manifest
+
+    ```bash
+    kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/master/deploy/longhorn.yaml
+    ```
+
+1. Wait until the deployment is finished / all pods have spun up (you can check
+   the status by running `kubectl -n longhorn-system get all`). If everything
+   went as planned, you should see the following output when running `kubectl
+   get storageclass`
+
+    ```
+    NAME                   PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+    local-path (default)   rancher.io/local-path   Delete          WaitForFirstConsumer   false                  3d6h
+    longhorn (default)     driver.longhorn.io      Delete          Immediate              true                   5m12s
+    ```
+
+1. Deploy the database to the `demo` namespace by running `kubectl -n demo
+   apply -f ./persistent-storage/persistent-storage.yml`.
+
+1. We can now deploy a version of the demo-app which contains the database
+   credentials on top of the existing deployment. To do this, apply the updated
+   manifest to the `demo` namespace by running `kubectl apply -f
+   ./persistent-storage/demo-app-persistent-tls-prod.yml`
 
 </details>
 
