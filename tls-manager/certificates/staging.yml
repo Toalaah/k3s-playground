@@ -1,13 +1,12 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: tls-production
-  namespace: demo
+  name: tls-staging
 spec:
-  secretName: tls-production
+  secretName: tls-staging
   issuerRef:
-    name: letsencrypt-production
+    name: letsencrypt-staging
     kind: ClusterIssuer
   commonName: k8s.kunst.me
   dnsNames:
-  - k8s.kunst.me
+    - k8s.kunst.me

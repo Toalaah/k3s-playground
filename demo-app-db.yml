@@ -31,11 +31,11 @@ spec:
               mountPath: /var/lib/postgresql/data
           resources:
             requests:
-              memory: '64Mi'
-              cpu: '10m'
+              memory: "64Mi"
+              cpu: "10m"
             limits:
-              memory: '256Mi'
-              cpu: '1'
+              memory: "256Mi"
+              cpu: "1"
 
       volumes:
         - name: demo-app-db-data
@@ -43,7 +43,6 @@ spec:
             claimName: demo-app-db-volume-claim
 
 ---
-
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -58,7 +57,6 @@ spec:
   storageClassName: longhorn
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
