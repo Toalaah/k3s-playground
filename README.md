@@ -425,7 +425,7 @@ dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-da
 It provides a nice way to oversee your cluster and quickly manage / debug pods.
 We will be deploying the dashboard to the path `/dashboard`, although this is
 configurable to your liking by changing the path / annotations in the
-[`dashboard/dashboard-ingress.yml`](./dashboard/dashboard-ingress.yml) file.
+[`dashboard/ingress.yml`](./dashboard/ingress.yml) file.
 
 > **Note:** the dashboard is **only** accessible via SSL (HTTPS), so you must
 > ensure you have some sort of infrastructure setup to issue and provision SSL
