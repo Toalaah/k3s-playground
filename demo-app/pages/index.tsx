@@ -11,8 +11,8 @@ import type { AppRouter } from '../backend/router'
 export const trpc = createReactQueryHooks<AppRouter>()
 
 const Home: NextPage = () => {
-  var id = 0
   const ok = useRef(false)
+  const id = useRef(0)
   const [value, setValue] = useState(0)
   const mutation = trpc.useMutation(['set-count'])
 
@@ -25,6 +25,7 @@ const Home: NextPage = () => {
     onSuccess: (data) => {
       ok.current = true
       setValue(data.count?.count ?? 0)
+      id.current = data.count.id ?? 0
     },
     onError: () => {
       toast.warn(
@@ -59,7 +60,7 @@ const Home: NextPage = () => {
         <p
           onClick={() => {
             setValue(value + 1)
-            ok.current && mutation.mutate({ id: id, count: value + 1 })
+            ok.current && mutation.mutate({ id: id.current, count: value + 1 })
           }}
           className={styles.card}
         >
