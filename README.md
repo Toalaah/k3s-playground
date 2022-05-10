@@ -14,7 +14,7 @@ up a cluster (mainly so that I don't forget half of the things I did in a
 couple weeks time). It may therefore still be quite primitive and mistakes are
 likely.
 
-> **Note:** This guide was "tested" once on a standard DigitalOcean droplet and
+> ⚠️ **Note:** This guide was "tested" once on a standard DigitalOcean droplet and
 > once on a Contabo VPS. No guarantees for other providers, but the process
 > should translate mostly one-for-one.
 
@@ -90,7 +90,7 @@ remote into the server.
     entry. The installation may take several minutes and hang at times, but it
     should eventually go through after anywhere between 1-5mins.
 
-    > **Note:** We will install K3s without the standard Traefik ingress
+    > ⚠️ **Note:** We will install K3s without the standard Traefik ingress
     > as we will be manually adding an NGINX ingress controller later.
 
     ```bash
@@ -109,7 +109,7 @@ remote into the server.
      --local-path $HOME/.kube/config
     ```
 
-    > **Note:** You can copy SSH keys to a remote VM with `ssh-copy-id user@IP`.
+    > ⚠️ **Note:** You can copy SSH keys to a remote VM with `ssh-copy-id user@IP`.
 
 1.  Ensure that the installation succeeded by running `kubectl get nodes`. You
     should something similar to the following output.
@@ -193,7 +193,7 @@ parts / blocks:
 1. The deployment specification. This will create a deployment with 2 container
    replicas running the demo [Next.js](./demo-app/README.md) application.
 
-   > **Note:** feel free to swap this image out with any other image you
+   > ⚠️ **Note:** feel free to swap this image out with any other image you
    > preference. It will, by default, search the docker registry so make sure
    > that it can be found there.
    >
@@ -202,7 +202,7 @@ parts / blocks:
 
 1. The service specification. This will allow us to interface with the pods.
 
-   > **Note:** the target port must match the container port specified in the
+   > ⚠️ **Note:** the target port must match the container port specified in the
    > deployment block. If you changed the image, you might need to amend this
    > in the service as well.
 
@@ -211,7 +211,7 @@ parts / blocks:
 Before deploying, make sure that you change the host in the ingress object to
 point to your server.
 
-> **Note:** if you only have an IP address you may have to use a service such
+> ⚠️ **Note:** if you only have an IP address you may have to use a service such
 > as [nip.io](https://nip.io/) in order for K3s to consider the host valid.
 
 Afterwards, deploying is as easy as running the following commands
@@ -301,7 +301,7 @@ rate-limiting.
 First, setup the staging cluster issuer by applying the file
 [`./tls-manager/issuer/staging.yml`](./tls-manager/issuer/staging.yml).
 
-> **Note:** make sure to change the email in the file accordingly!
+> ⚠️ **Note:** make sure to change the email in the file accordingly!
 
 ```bash
 kubectl apply -f ./tls-manager/issuer/staging.yml
@@ -331,7 +331,7 @@ All we need to do in order to create this certificate is to apply the file
 [`./tls-manager/certificates/staging.yml`](./tls-manager/certificates/staging.yml)
 to the `demo` namespace.
 
-> **Note:** make sure to change the common / dns name in the file accordingly!
+> ⚠️ **Note:** make sure to change the common / dns name in the file accordingly!
 > It should match the host specified in the ingress you applied while deploying
 > the demo app.
 
@@ -427,7 +427,7 @@ We will be deploying the dashboard to the path `/dashboard`, although this is
 configurable to your liking by changing the path / annotations in the
 [`dashboard/ingress.yml`](./dashboard/ingress.yml) file.
 
-> **Note:** the dashboard is **only** accessible via SSL (HTTPS), so you must
+> ⚠️ **Note:** the dashboard is **only** accessible via SSL (HTTPS), so you must
 > ensure you have some sort of infrastructure setup to issue and provision SSL
 > certs to namespaces as described in the [TLS section](#tls) above.
 
@@ -492,7 +492,7 @@ order for the auth-UI to show up.
    a couple of minutes). You can check the status by running `kubectl -n
    longhorn-system get all`.
 
-  > **Note:** If your longhorn manager is crashlooping it may be due to a
+  > ⚠️ **Note:** If your longhorn manager is crashlooping it may be due to a
   > missing dependency `open-iscsi`. Try running `apt-get update; apt-get
   > install open-iscsi` on the server as a possible fix. 
   >
@@ -546,7 +546,7 @@ order for the auth-UI to show up.
     #...
     ```
 
-    > **Note:** The env entries do not **need** to be minified, this was just
+    > ⚠️ **Note:** The env entries do not **need** to be minified, this was just
     done to retain readability
 
   All that is now left is to re-deploy and wait for the pods to spin up.
