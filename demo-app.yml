@@ -34,7 +34,6 @@ spec:
         app: k3s-demo
     spec:
       containers:
-        # TODO: image crashloops when no DB found, consider creating non-db version
         - image: skunst/k3s-demo
           imagePullPolicy: "Always"
           name: k3s-demo
