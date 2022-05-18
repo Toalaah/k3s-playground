@@ -29,6 +29,7 @@ likely.
    1. [Wildcard Certificates](#wildcard-certificates)
 1. [Kubernetes Dashboard](#kubernetes-dashboard)
 1. [Persistent Storage](#persistent-storage)
+1. [Keycloak](#keycloak)
 1. [Snippets](#snippets)
 
 ## Initialize Cluster
@@ -554,6 +555,74 @@ order for the auth-UI to show up.
    ```bash
    kubectl -n demo apply -f ./demo-app.yml
    ```
+
+</details>
+
+## Keycloak
+
+[📖 _Back to Table of Contents_](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+In this section we will be setting up a [Keycloak](https://www.keycloak.org/)
+instance with persistent storage. Keycloak is an open source identtity / access
+management application providing a simple way to authenticate users securlely
+using the standard OIDC protocol.
+
+
+> ⚠️ **Note:** The environment variables are written in plaintext in the
+> Keycloak manifests for **demonstartion** purposes only. It is **highly**
+> recommended that you create a seperate secrets object storing all the
+> required credentials and deploying it you your namespace, then using secret
+> key refs instead (see the code snippet in the [persistent
+> storage](#persistent-storage) section for an example).
+
+1. First, create a namespace called `keycloak` with `kubectl create ns
+   keycloak`
+
+1. Now, we use what we learned in the section on [persistent
+   storage](#persistent-storage) to create a postgres service with a persistent
+   volume claim.
+
+   ```bash
+    kubectl -n keycloak apply -f ./keycloak/db.yml
+   ```
+
+   Wait until the service is initialized. You can check the status by running a
+   simply `kubectl -n keycloak get pods`. Once the pods have a status of
+   "READY" we can continue.
+
+1. We can now apply the deployment file. We will be using the
+   `quay.io/keycloak/keycloak` variant of Keycloak for this demonstration.
+
+   ```bash
+    kubectl -n keycloak apply -f ./keycloak/deployment.yml
+   ```
+
+   Wait for the Keycloak pod to be ready. This may take one or two minutes as
+   the container is quite large, and as such, required some time to initialize.
+
+    > ⚠️ **Note:** You may find it helpful to periodically check the logs of the
+    > pods to check for any database connection issues or similar. However, if
+    > you use the provided manifests, they \*should\* work
+    > **#itworksonmycluster** **#tryturningitoffandonagain**
+
+
+1. Once both the deployments are up and running we can move on to creating an
+   ingress object pointing to the Keycloak service as well as a corresponding
+   certificate. Make sure to change the hostname accordingly.
+
+   ```bash
+    kubectl -n keycloak apply -f ./keycloak/ingress.yml
+    kubectl -n keycloak apply -f ./keycloak/cert.yml
+   ```
+
+    > ⚠️ **Note:** The example ingress object uses the subdomain `keycloak`.
+    > This will only work if you also point `keycloak.<your-domain>` to the
+    > cluster (or alternatively `*.<your-domain>`). Otherwise you may need to
+    > use paths (see the code snippet in the [kubernetes
+    > dashboard](#kubernetes-dashboard) section for an example)
 
 </details>
 
