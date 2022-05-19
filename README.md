@@ -30,6 +30,7 @@ likely.
 1. [Kubernetes Dashboard](#kubernetes-dashboard)
 1. [Persistent Storage](#persistent-storage)
 1. [Keycloak](#keycloak)
+1. [Storage Bucket](#storage-bucket)
 1. [Snippets](#snippets)
 
 ## Initialize Cluster
@@ -623,6 +624,71 @@ using the standard OIDC protocol.
     > cluster (or alternatively `*.<your-domain>`). Otherwise you may need to
     > use paths (see the code snippet in the [kubernetes
     > dashboard](#kubernetes-dashboard) section for an example)
+
+</details>
+
+## Storage Bucket
+
+[📖 _Back to Table of Contents_](#table-of-contents)
+
+<details open>
+<summary>Collapse Section</summary><br>
+
+In this section we will be setting up an storage bucket using
+[MinIO](https://min.io/). MinIO makes it easy to quickly setup S3 compatible
+object storage and even provides a nice web-ui to interface with out of the
+box.
+
+1. First, we create a new namespace and inject a secret object containing all
+   the credentials we need for our deployment.
+
+   ```bash
+    kubectl create namespace minio
+    cat << EOF | kubectl -n minio apply -f -
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: minio-secret
+    type: Opaque
+    data:
+      minio-user: $(echo -n "secure-username-here" | base64 -w0)
+      minio-password: $(echo -n "secure-password-here" | base64 -w0)
+    EOF
+   ```
+
+1. Next, we apply the deployment file to the namespace. This will also create a
+   persistent volume claim so that the deployment can retain state after new
+   rollouts. Ensure that the deployment and PVC are ready by checking their
+   status using `kubectl -n minio get deployment,pvc`.
+
+   ```bash
+    kubectl -n minio apply -f ./minio/deployment.yml
+   ```
+
+1. Now create a service which allows us to expose both the MinIO api
+   and web-ui.
+
+   ```bash
+    kubectl -n minio apply -f ./minio/service.yml
+   ```
+    > ⚠️ **Note:** If you do not wish to expose the web-console, remove the port
+    > entry pointing to 9001 from the service (or you could omit the ingress
+    > route later on, either will work)
+
+
+1. All that is left now is to create an ingress object and optionally generate
+   TLS certificates. You can find both the required files in the
+   [`minio`](./minio) folder.
+
+    > ⚠️ **Note:** Make sure to change the host names appropriately! If you only
+    > wish to expose the API or altered the service in the previous step,
+    > remember to remove the host entry pointing to port `9001` of the
+    > `minio-service`.
+
+   ```bash
+    kubectl -n minio apply -f ./minio/cert.yml
+    kubectl -n minio apply -f ./minio/ingress.yml
+   ```
 
 </details>
 

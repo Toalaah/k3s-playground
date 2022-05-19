@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-keycloak
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+    - hosts:
+        - minio.k8s.kunst.me
+        - s3.k8s.kunst.me
+      secretName: tls-production
+  rules:
+    # this redirects to the minio web-console
+    - host: minio.k8s.kunst.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-service
+                port:
+                  number: 9001
+    # this redirects to the minio api
+    - host: s3.k8s.kunst.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minio-service
+                port:
+                  number: 9000

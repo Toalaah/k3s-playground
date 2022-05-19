@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-production
+spec:
+  secretName: tls-production
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: minio.k8s.kunst.me
+  dnsNames:
+    - minio.k8s.kunst.me
+    - s3.k8s.kunst.me
